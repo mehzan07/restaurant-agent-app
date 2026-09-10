@@ -118,6 +118,30 @@ def write_project_file(relative_path: str, content: str) -> str:
 
     return f"Created file: {relative_path}"
 
+@function_tool
+def read_project_file(relative_path: str) -> str:
+    """
+    Read a text file inside the restaurant project.
+
+    Args:
+        relative_path: File path relative to the project root,
+            for example app.py or templates/index.html.
+    """
+
+    target_path = (PROJECT_DIR / relative_path).resolve()
+
+    try:
+        target_path.relative_to(PROJECT_DIR)
+    except ValueError:
+        return "ERROR: Reading outside the project directory is not allowed."
+
+    if not target_path.exists():
+        return f"ERROR: File does not exist: {relative_path}"
+
+    if not target_path.is_file():
+        return f"ERROR: Not a file: {relative_path}"
+
+    return target_path.read_text(encoding="utf-8")
 
 if __name__ == "__main__":
 
@@ -136,31 +160,52 @@ if __name__ == "__main__":
     skill_catalog = build_skill_catalog(available_skills)
 
     user_request = """
-Create the first version of the restaurant reservation application.
+Upgrade the existing restaurant reservation application to Version 4.
 
-For this version create only:
+The existing application already contains:
 
 - app.py
 - templates/index.html
 - static/css/style.css
 - static/js/app.js
+- a working reservation form
+- Flask server-side validation
+
+Do not rebuild the application from scratch.
+
+Add reservation persistence using SQLite.
 
 Requirements:
 
-- Python Flask backend
-- modern responsive restaurant interface
-- reservation form
-- name
-- email
-- phone
-- reservation date
-- reservation time
-- number of guests
-- special requests
+1. Create a SQLite reservation database.
+2. Create a reservations table.
+3. Store successful reservations in the database.
+4. Generate a unique customer-facing booking reference.
+5. Use a reference format similar to:
+   TR-260910-5831
+6. Never expose the internal database ID as the booking reference.
+7. Store:
+   - reservation reference
+   - customer name
+   - email
+   - phone
+   - reservation date
+   - reservation time
+   - number of guests
+   - special requests
+   - reservation status
+   - created timestamp
+8. Validate reservations on the Flask server before storing them.
+9. Invalid reservations must never be stored.
+10. Show the booking reference to the customer after a successful reservation.
+11. Keep the existing responsive desktop, tablet and mobile design.
+12. Do not add email functionality yet.
+13. Do not add deployment configuration yet.
 
-The reservation form does not need database storage yet.
+Modify the existing files where necessary and create new project files
+when appropriate.
 
-Create the actual files using the available file tool.
+Use the available file tool to make the changes.
 """
 
     # ========================================
@@ -256,8 +301,9 @@ Rules:
 """,
 
         tools=[
-            write_project_file
-        ],
+                read_project_file,
+               write_project_file,
+],
     )
 
     result = Runner.run_sync(

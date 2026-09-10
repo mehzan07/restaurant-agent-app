@@ -20,7 +20,7 @@ form?.addEventListener('submit', async (event) => {
   try {
     const response = await fetch('/api/reservations', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
     const result = await response.json();
-    if (!response.ok) throw new Error(Object.values(result.errors || {})[0] || 'Please check your details.');
+    if (!response.ok) throw new Error(Object.values(result.errors || {})[0] || result.message || 'Please check your details.');
     status.classList.add('success');
     status.textContent = result.message;
     form.reset();
