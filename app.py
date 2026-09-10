@@ -1,7 +1,9 @@
 import os
 import secrets
+import smtplib
 import sqlite3
 from datetime import date, datetime
+from email.message import EmailMessage
 from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
@@ -65,6 +67,40 @@ def create_reference():
     return f"TR-{datetime.now().strftime('%y%m%d')}-{secrets.randbelow(10000):04d}"
 
 
+def send_confirmation(reservation):
+    server = os.environ.get("MAIL_SERVER")
+    username = os.environ.get("MAIL_USERNAME")
+    password = os.environ.get("MAIL_PASSWORD")
+    port = int(os.environ.get("MAIL_PORT", "587"))
+    sender = os.environ.get("MAIL_FROM") or username or os.environ.get("RESTAURANT_EMAIL")
+    if not server or not sender:
+        raise RuntimeError("Email service is not configured")
+
+    special = reservation["special_requests"] or "None"
+    message = EmailMessage()
+    message["Subject"] = f"Your Citrine & Salt reservation — {reservation['reservation_reference']}"
+    message["From"] = sender
+    message["To"] = reservation["email"]
+    message.set_content(
+        f"Hello {reservation['customer_name']},\n\n"
+        "Your reservation is confirmed.\n\n"
+        f"Booking reference: {reservation['reservation_reference']}\n"
+        f"Date: {reservation['reservation_date']}\n"
+        f"Time: {reservation['reservation_time']}\n"
+        f"Guests: {reservation['guests']}\n"
+        f"Special requests: {special}\n\n"
+        "We look forward to welcoming you.\nCitrine & Salt"
+    )
+    with smtplib.SMTP(server, port, timeout=15) as smtp:
+        smtp.ehlo()
+        if port != 25:
+            smtp.starttls()
+            smtp.ehlo()
+        if username and password:
+            smtp.login(username, password)
+        smtp.send_message(message)
+
+
 @app.get("/")
 def home():
     return render_template("index.html")
@@ -93,6 +129,7 @@ def create_reservation():
               str(data.get("special_requests", "")).strip(), "confirmed",
               datetime.utcnow().isoformat(timespec="seconds") + "Z"))
         connection.commit()
+        reservation = connection.execute("SELECT * FROM reservations WHERE reservation_reference = ?", (reference,)).fetchone()
     except sqlite3.Error:
         connection.rollback()
         app.logger.exception("Unable to save reservation")
@@ -100,8 +137,13 @@ def create_reservation():
     finally:
         connection.close()
 
-    return jsonify({"success": True, "reference": reference,
-                    "message": f"Your reservation is confirmed. Booking reference: {reference}"})
+    try:
+        send_confirmation(reservation)
+        message = f"Your reservation is confirmed. Booking reference: {reference}. A confirmation email has been sent."
+    except Exception:
+        app.logger.exception("Reservation confirmation email failed for reference %s", reference)
+        message = f"Your reservation is confirmed. Booking reference: {reference}. We could not send the email, so please keep this reference."
+    return jsonify({"success": True, "reference": reference, "message": message})
 
 
 init_db()

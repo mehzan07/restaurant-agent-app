@@ -160,52 +160,75 @@ if __name__ == "__main__":
     skill_catalog = build_skill_catalog(available_skills)
 
     user_request = """
-Upgrade the existing restaurant reservation application to Version 4.
+Upgrade the existing restaurant reservation application to Version 5.
 
 The existing application already contains:
 
-- app.py
-- templates/index.html
-- static/css/style.css
-- static/js/app.js
-- a working reservation form
-- Flask server-side validation
+- Flask backend
+- responsive restaurant reservation interface
+- SQLite reservation database
+- server-side validation
+- unique customer-facing booking references
+- reservation confirmation in the browser
 
 Do not rebuild the application from scratch.
 
-Add reservation persistence using SQLite.
+Add reservation confirmation by email.
 
 Requirements:
 
-1. Create a SQLite reservation database.
-2. Create a reservations table.
-3. Store successful reservations in the database.
-4. Generate a unique customer-facing booking reference.
-5. Use a reference format similar to:
-   TR-260910-5831
-6. Never expose the internal database ID as the booking reference.
-7. Store:
-   - reservation reference
+1. After a valid reservation is successfully stored,
+   send a confirmation email to the customer.
+
+2. The email must contain:
    - customer name
-   - email
-   - phone
+   - booking reference
    - reservation date
    - reservation time
    - number of guests
-   - special requests
-   - reservation status
-   - created timestamp
-8. Validate reservations on the Flask server before storing them.
-9. Invalid reservations must never be stored.
-10. Show the booking reference to the customer after a successful reservation.
-11. Keep the existing responsive desktop, tablet and mobile design.
-12. Do not add email functionality yet.
-13. Do not add deployment configuration yet.
+   - special requests when available
 
-Modify the existing files where necessary and create new project files
-when appropriate.
+3. Use SMTP configuration from environment variables.
 
-Use the available file tool to make the changes.
+4. Never hard-code:
+   - email password
+   - SMTP password
+   - API key
+   - access token
+
+5. Use environment variables such as:
+   - MAIL_SERVER
+   - MAIL_PORT
+   - MAIL_USERNAME
+   - MAIL_PASSWORD
+   - MAIL_FROM
+   - RESTAURANT_EMAIL
+
+6. Create .env.example containing only variable names
+   and safe example values.
+
+7. Do not create a real .env file containing credentials.
+
+8. If sending the email fails:
+   - do not delete the reservation
+   - do not lose the booking reference
+   - log the email error safely
+   - return a useful message to the customer
+
+9. Preserve the existing SQLite database functionality.
+
+10. Preserve the existing booking reference functionality.
+
+11. Preserve the responsive desktop, tablet and mobile design.
+
+12. Do not add deployment functionality yet.
+
+13. Do not expose SMTP credentials or internal exception details
+    to the browser.
+
+Before modifying any existing file, read it first.
+
+Use the available project tools to create or update the files.
 """
 
     # ========================================
@@ -284,27 +307,44 @@ SELECTED SKILLS:
 
 {selected_skill_instructions}
 
-You have a tool named write_project_file.
+You have two project tools:
 
-Use that tool to create the requested project files.
+- read_project_file
+- write_project_file
 
-Rules:
+Before modifying an existing file, read it first.
 
-1. Create only files required by the current task.
-2. Never attempt to write outside the project directory.
-3. Do not modify the Skills.
-4. Do not create database files yet.
-5. Do not add email functionality yet.
-6. Do not add deployment configuration yet.
-7. Make the interface responsive for desktop, tablet and mobile.
-8. After creating the files, summarize exactly what was created.
+Preserve existing working functionality unless the current task
+explicitly requires changing it.
+
+Never attempt to read or write outside the project directory.
+
+Never modify the Skill files.
+
+Never expose credentials or secrets.
+
+Use environment variables for sensitive configuration such as
+SMTP usernames, passwords, API keys, or access tokens.
+
+Preserve the existing SQLite reservation database.
+
+Preserve the existing booking reference functionality.
+
+Preserve the responsive desktop, tablet and mobile design.
+
+Do not add deployment configuration yet.
+
+Use write_project_file to create or update project files.
+
+After completing the task, summarize exactly what was created
+or modified.
 """,
 
         tools=[
                 read_project_file,
                write_project_file,
-],
-    )
+            ],
+         )
 
     result = Runner.run_sync(
         development_agent,
