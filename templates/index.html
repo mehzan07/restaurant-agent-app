@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Citrine & Salt — seasonal dining and easy table reservations.">
+  <title>Citrine & Salt | Seasonal Dining</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Citrine and Salt home"><span>citrine</span> & salt</a>
+    <nav aria-label="Main navigation">
+      <a href="#story">Our story</a>
+      <a href="#menu">Menu</a>
+      <a class="nav-cta" href="#reserve">Book a table</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Seasonal dining · Since 2018</p>
+        <h1 id="hero-title">Good food,<br><em>beautifully</em> shared.</h1>
+        <p class="hero-text">A neighborhood table for bright flavors, warm evenings, and the people who make them memorable.</p>
+        <a class="button button-light" href="#reserve">Reserve your table <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="hero-note"><span class="line"></span><span>Market-led cooking<br>in the heart of the city</span></div>
+    </section>
+
+    <section class="intro section" id="story">
+      <p class="eyebrow">The Citrine & Salt way</p>
+      <div class="intro-grid">
+        <h2>Simple ingredients.<br><em>Thoughtful plates.</em></h2>
+        <p>We cook with the seasons, source from people we know, and leave room for the unexpected. Come for dinner, stay for another glass.</p>
+      </div>
+    </section>
+
+    <section class="menu-section section" id="menu" aria-labelledby="menu-title">
+      <div class="section-heading"><div><p class="eyebrow">A taste of tonight</p><h2 id="menu-title">From the kitchen</h2></div><span class="menu-mark">✳</span></div>
+      <div class="menu-grid">
+        <article class="menu-card"><span class="dish-number">01</span><h3>Charred sourdough</h3><p>Whipped cultured butter · smoked sea salt</p><strong>$8</strong></article>
+        <article class="menu-card accent"><span class="dish-number">02</span><h3>Market fish</h3><p>Green olive, lemon, garden herbs</p><strong>$28</strong></article>
+        <article class="menu-card"><span class="dish-number">03</span><h3>Roasted carrots</h3><p>Almond cream · chili crisp · mint</p><strong>$15</strong></article>
+      </div>
+    </section>
+
+    <section class="reserve section" id="reserve" aria-labelledby="reserve-title">
+      <div class="reserve-copy"><p class="eyebrow">Your table awaits</p><h2 id="reserve-title">Make an evening<br><em>of it.</em></h2><p>We hold tables for 15 minutes. For parties of more than 8, please give us a call.</p><p class="contact">(212) 555-0184<br>hello@citrineandsalt.com</p></div>
+      <form id="reservation-form" novalidate>
+        <div class="form-row"><label>Full name<input name="name" type="text" autocomplete="name" required></label><label>Email<input name="email" type="email" autocomplete="email" required></label></div>
+        <div class="form-row"><label>Phone<input name="phone" type="tel" autocomplete="tel" required></label><label>Guests<select name="guests" required><option value="">Select</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label></div>
+        <div class="form-row"><label>Date<input name="reservation_date" type="date" required></label><label>Time<select name="reservation_time" required><option value="">Select</option><option>5:30 PM</option><option>6:00 PM</option><option>6:30 PM</option><option>7:00 PM</option><option>7:30 PM</option><option>8:00 PM</option><option>8:30 PM</option></select></label></div>
+        <label>Special requests <span class="optional">(optional)</span><textarea name="special_requests" rows="3" placeholder="Dietary needs, celebrations, or anything else..."></textarea></label>
+        <button class="button button-dark" type="submit">Request a reservation <span aria-hidden="true">↗</span></button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <footer><span>citrine & salt</span><span>Seasonal food · Open Tuesday–Sunday</span></footer>
+</body>
+</html>

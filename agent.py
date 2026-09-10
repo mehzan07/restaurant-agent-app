@@ -1,15 +1,15 @@
 from pathlib import Path
 import re
 
-from agents import Agent, Runner
+from agents import Agent, Runner, function_tool
 
-SKILLS_DIR = Path(__file__).parent / "skills"
+PROJECT_DIR = Path(__file__).parent.resolve()
+SKILLS_DIR = PROJECT_DIR / "skills"
 
 
 def get_available_skills():
     """
     Read only the folder name and description of each Skill.
-    The complete SKILL.md content is not loaded yet.
     """
 
     skills = {}
@@ -44,8 +44,7 @@ def get_available_skills():
 
 def load_selected_skills(selected_skill_names):
     """
-    Load the complete SKILL.md content only
-    for the Skills selected by the selector Agent.
+    Load complete SKILL.md content only for selected Skills.
     """
 
     selected_skills = {}
@@ -55,7 +54,6 @@ def load_selected_skills(selected_skill_names):
         skill_file = SKILLS_DIR / skill_name / "SKILL.md"
 
         if skill_file.exists():
-
             selected_skills[skill_name] = skill_file.read_text(
                 encoding="utf-8"
             )
@@ -64,11 +62,6 @@ def load_selected_skills(selected_skill_names):
 
 
 def build_skill_catalog(skills):
-    """
-    Build a small catalog containing only
-    Skill names and descriptions.
-    """
-
     lines = []
 
     for name, description in skills.items():
@@ -78,11 +71,6 @@ def build_skill_catalog(skills):
 
 
 def build_skill_instructions(skills):
-    """
-    Combine the complete contents of only
-    the selected Skills.
-    """
-
     parts = []
 
     for name, content in skills.items():
@@ -98,6 +86,37 @@ SKILL: {name}
         )
 
     return "\n".join(parts)
+
+
+@function_tool
+def write_project_file(relative_path: str, content: str) -> str:
+    """
+    Create or overwrite a text file inside the restaurant project.
+
+    Args:
+        relative_path: File path relative to the project root,
+            for example templates/index.html.
+        content: Complete text content to write to the file.
+    """
+
+    target_path = (PROJECT_DIR / relative_path).resolve()
+
+    try:
+        target_path.relative_to(PROJECT_DIR)
+    except ValueError:
+        return "ERROR: Writing outside the project directory is not allowed."
+
+    target_path.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    target_path.write_text(
+        content,
+        encoding="utf-8"
+    )
+
+    return f"Created file: {relative_path}"
 
 
 if __name__ == "__main__":
@@ -117,9 +136,31 @@ if __name__ == "__main__":
     skill_catalog = build_skill_catalog(available_skills)
 
     user_request = """
-Build the reservation part of the restaurant website.
+Create the first version of the restaurant reservation application.
 
-Do not build the complete restaurant application yet.
+For this version create only:
+
+- app.py
+- templates/index.html
+- static/css/style.css
+- static/js/app.js
+
+Requirements:
+
+- Python Flask backend
+- modern responsive restaurant interface
+- reservation form
+- name
+- email
+- phone
+- reservation date
+- reservation time
+- number of guests
+- special requests
+
+The reservation form does not need database storage yet.
+
+Create the actual files using the available file tool.
 """
 
     # ========================================
@@ -168,7 +209,7 @@ Do not invent Skill names.
 
     # ========================================
     # STAGE 3
-    # Load only the selected Skills
+    # Load selected Skills
     # ========================================
 
     selected_skills = load_selected_skills(
@@ -181,33 +222,42 @@ Do not invent Skill names.
 
     # ========================================
     # STAGE 4
-    # Restaurant Development Agent
+    # Development Agent with file tool
     # ========================================
 
     development_agent = Agent(
         name="Restaurant Development Agent",
+
         instructions=f"""
 You are an AI software development agent.
 
-Your goal is to help build a restaurant application.
+You are working only inside this restaurant project.
 
-For this task, the following Skills have been selected.
-
-Follow their instructions carefully.
+Use the selected Skills below.
 
 SELECTED SKILLS:
 
 {selected_skill_instructions}
 
-For the current request:
+You have a tool named write_project_file.
 
-1. Explain which Skills are being used.
-2. Explain why each Skill is relevant.
-3. Create a short implementation plan.
-4. Do not build the complete application yet.
-5. Do not claim that files were modified unless
-   tools actually modified them.
+Use that tool to create the requested project files.
+
+Rules:
+
+1. Create only files required by the current task.
+2. Never attempt to write outside the project directory.
+3. Do not modify the Skills.
+4. Do not create database files yet.
+5. Do not add email functionality yet.
+6. Do not add deployment configuration yet.
+7. Make the interface responsive for desktop, tablet and mobile.
+8. After creating the files, summarize exactly what was created.
 """,
+
+        tools=[
+            write_project_file
+        ],
     )
 
     result = Runner.run_sync(
