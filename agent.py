@@ -160,7 +160,7 @@ if __name__ == "__main__":
     skill_catalog = build_skill_catalog(available_skills)
 
     user_request = """
-Upgrade the existing restaurant reservation application to Version 7.
+Upgrade the existing restaurant reservation application to Version 8.
 
 The application already contains:
 
@@ -170,57 +170,57 @@ The application already contains:
 - unique booking references
 - SMTP email confirmations
 - automated pytest tests
+- security hardening
 
 Do not rebuild the application from scratch.
 
-Perform a security review of the existing application.
+Prepare the application for production deployment.
 
 Requirements:
 
-1. Use the Security Review Skill.
-2. Review the application for:
-   - hard-coded passwords
-   - exposed API keys
-   - exposed SMTP credentials
-   - SQL injection
-   - unsafe database queries
-   - cross-site scripting risks
-   - unsafe HTML output
-   - missing server-side validation
-   - sensitive error messages
-   - insecure logging
-   - unsafe environment-variable handling
-   - Flask debug mode
-   - unsafe file operations
-   - secrets committed to Git
-   - insecure dependencies
+1. Use the Deployment Skill.
 
-3. Classify findings as:
-   - CRITICAL
-   - HIGH
-   - MEDIUM
-   - LOW
+2. Review the current project and prepare it for deployment.
 
-4. Fix any CRITICAL or HIGH issues that can be safely fixed now.
+3. Verify:
+   - Flask debug mode is disabled
+   - requirements.txt is complete
+   - environment variables are documented
+   - SMTP credentials are not stored in source code
+   - .env is ignored by Git
+   - database configuration is documented
+   - static files are served correctly
+   - application startup is production-ready
+   - tests still pass
+   - security review requirements remain satisfied
 
-5. Preserve all existing working functionality.
+4. Add a production WSGI server if needed.
 
-6. Do not break:
+5. Create deployment documentation.
+
+6. Create or update:
+   - requirements.txt
+   - .env.example
+   - deployment documentation
+   - startup configuration if required
+
+7. Preserve:
    - reservation storage
    - booking references
    - email confirmation
    - responsive design
    - automated tests
+   - security fixes
 
-7. Do not add deployment functionality yet.
+8. Do not expose credentials.
 
-8. Before modifying any existing file, read it first.
+9. Before modifying any existing file, read it first.
 
-9. After the review, summarize:
-   - security findings
-   - files changed
-   - issues fixed
-   - remaining risks
+10. After the work is complete, summarize:
+   - files created
+   - files modified
+   - deployment requirements
+   - remaining deployment steps
 """
 
     # ========================================
@@ -333,6 +333,9 @@ the production reservation database.
 Tests must use isolated test data and a temporary test database.
 
 Do not add deployment configuration yet.
+
+For deployment preparation, do not deploy the application automatically.
+Only prepare configuration, dependencies, and documentation.
 
 Use write_project_file to create or update project files.
 
