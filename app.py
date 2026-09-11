@@ -10,6 +10,7 @@ app = Flask(__name__)
 DATABASE = os.environ.get("RESERVATION_DATABASE", os.path.join(os.path.dirname(__file__), "reservations.sqlite3"))
 REQUIRED_FIELDS = ("name", "email", "phone", "reservation_date", "reservation_time", "guests")
 ALLOWED_TIMES = {"5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM"}
+MAX_LENGTHS = {"name": 100, "email": 254, "phone": 30, "special_requests": 1000}
 
 
 def get_db():
@@ -40,10 +41,16 @@ def init_db():
 def validate_reservation(data):
     errors = {}
     for field in REQUIRED_FIELDS:
-        if not str(data.get(field, "")).strip():
+        value = str(data.get(field, "")).strip()
+        if not value:
             errors[field] = "This field is required."
+        elif field in MAX_LENGTHS and len(value) > MAX_LENGTHS[field]:
+            errors[field] = "This field is too long."
+    special = str(data.get("special_requests", "")).strip()
+    if len(special) > MAX_LENGTHS["special_requests"]:
+        errors["special_requests"] = "Special requests are too long."
     email = str(data.get("email", "")).strip()
-    if email and ("@" not in email or "." not in email.rsplit("@", 1)[-1]):
+    if email and (len(email) > 254 or "@" not in email or "." not in email.rsplit("@", 1)[-1]):
         errors["email"] = "Enter a valid email address."
     reservation_date = str(data.get("reservation_date", "")).strip()
     if reservation_date:
@@ -71,9 +78,12 @@ def send_confirmation(reservation):
     server = os.environ.get("MAIL_SERVER")
     username = os.environ.get("MAIL_USERNAME")
     password = os.environ.get("MAIL_PASSWORD")
-    port = int(os.environ.get("MAIL_PORT", "587"))
+    try:
+        port = int(os.environ.get("MAIL_PORT", "587"))
+    except ValueError:
+        raise RuntimeError("Invalid email service configuration")
     sender = os.environ.get("MAIL_FROM") or username or os.environ.get("RESTAURANT_EMAIL")
-    if not server or not sender:
+    if not server or not sender or not (1 <= port <= 65535):
         raise RuntimeError("Email service is not configured")
 
     special = reservation["special_requests"] or "None"
@@ -82,13 +92,10 @@ def send_confirmation(reservation):
     message["From"] = sender
     message["To"] = reservation["email"]
     message.set_content(
-        f"Hello {reservation['customer_name']},\n\n"
-        "Your reservation is confirmed.\n\n"
+        f"Hello {reservation['customer_name']},\n\nYour reservation is confirmed.\n\n"
         f"Booking reference: {reservation['reservation_reference']}\n"
-        f"Date: {reservation['reservation_date']}\n"
-        f"Time: {reservation['reservation_time']}\n"
-        f"Guests: {reservation['guests']}\n"
-        f"Special requests: {special}\n\n"
+        f"Date: {reservation['reservation_date']}\nTime: {reservation['reservation_time']}\n"
+        f"Guests: {reservation['guests']}\nSpecial requests: {special}\n\n"
         "We look forward to welcoming you.\nCitrine & Salt"
     )
     with smtplib.SMTP(server, port, timeout=15) as smtp:
@@ -149,4 +156,4 @@ def create_reservation():
 init_db()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)

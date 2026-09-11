@@ -160,51 +160,67 @@ if __name__ == "__main__":
     skill_catalog = build_skill_catalog(available_skills)
 
     user_request = """
-Upgrade the existing restaurant reservation application to Version 6.
+Upgrade the existing restaurant reservation application to Version 7.
 
-The application already has:
+The application already contains:
 
 - Flask backend
 - responsive reservation form
 - SQLite reservation database
 - unique booking references
-- Gmail SMTP confirmation email
-- server-side validation
+- SMTP email confirmations
+- automated pytest tests
 
 Do not rebuild the application from scratch.
 
-Add automated tests for the reservation workflow.
+Perform a security review of the existing application.
 
 Requirements:
 
-1. Use pytest.
-2. Create automated tests for:
-   - home page loads successfully
-   - valid reservation succeeds
-   - missing customer name is rejected
-   - invalid email is rejected
-   - zero guests are rejected
-   - negative guests are rejected
-   - past reservation date is rejected
-   - invalid reservation time is rejected
-   - successful reservation is stored in SQLite
-   - booking reference is generated
-   - booking reference is unique
-   - confirmation response contains the booking reference
-3. Email sending must not send real emails during automated tests.
-4. Mock or disable SMTP during tests.
-5. Test email success behavior.
-6. Test email failure behavior.
-7. If email sending fails:
-   - reservation must remain stored
-   - booking reference must remain valid
-8. Tests must use a temporary test database, not the real reservations.sqlite3 file.
-9. Preserve all existing V5 functionality.
-10. Do not add deployment functionality yet.
+1. Use the Security Review Skill.
+2. Review the application for:
+   - hard-coded passwords
+   - exposed API keys
+   - exposed SMTP credentials
+   - SQL injection
+   - unsafe database queries
+   - cross-site scripting risks
+   - unsafe HTML output
+   - missing server-side validation
+   - sensitive error messages
+   - insecure logging
+   - unsafe environment-variable handling
+   - Flask debug mode
+   - unsafe file operations
+   - secrets committed to Git
+   - insecure dependencies
 
-Before modifying any existing file, read it first.
+3. Classify findings as:
+   - CRITICAL
+   - HIGH
+   - MEDIUM
+   - LOW
 
-Use the project tools to create or update the files.
+4. Fix any CRITICAL or HIGH issues that can be safely fixed now.
+
+5. Preserve all existing working functionality.
+
+6. Do not break:
+   - reservation storage
+   - booking references
+   - email confirmation
+   - responsive design
+   - automated tests
+
+7. Do not add deployment functionality yet.
+
+8. Before modifying any existing file, read it first.
+
+9. After the review, summarize:
+   - security findings
+   - files changed
+   - issues fixed
+   - remaining risks
 """
 
     # ========================================
@@ -292,6 +308,7 @@ Before modifying an existing file, read it first.
 
 Preserve existing working functionality unless the current task
 explicitly requires changing it.
+During security review, do not change working behavior unless necessary to fix a real security issue.
 
 Never attempt to read or write outside the project directory.
 
