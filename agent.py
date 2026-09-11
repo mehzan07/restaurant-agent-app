@@ -160,75 +160,51 @@ if __name__ == "__main__":
     skill_catalog = build_skill_catalog(available_skills)
 
     user_request = """
-Upgrade the existing restaurant reservation application to Version 5.
+Upgrade the existing restaurant reservation application to Version 6.
 
-The existing application already contains:
+The application already has:
 
 - Flask backend
-- responsive restaurant reservation interface
+- responsive reservation form
 - SQLite reservation database
+- unique booking references
+- Gmail SMTP confirmation email
 - server-side validation
-- unique customer-facing booking references
-- reservation confirmation in the browser
 
 Do not rebuild the application from scratch.
 
-Add reservation confirmation by email.
+Add automated tests for the reservation workflow.
 
 Requirements:
 
-1. After a valid reservation is successfully stored,
-   send a confirmation email to the customer.
-
-2. The email must contain:
-   - customer name
-   - booking reference
-   - reservation date
-   - reservation time
-   - number of guests
-   - special requests when available
-
-3. Use SMTP configuration from environment variables.
-
-4. Never hard-code:
-   - email password
-   - SMTP password
-   - API key
-   - access token
-
-5. Use environment variables such as:
-   - MAIL_SERVER
-   - MAIL_PORT
-   - MAIL_USERNAME
-   - MAIL_PASSWORD
-   - MAIL_FROM
-   - RESTAURANT_EMAIL
-
-6. Create .env.example containing only variable names
-   and safe example values.
-
-7. Do not create a real .env file containing credentials.
-
-8. If sending the email fails:
-   - do not delete the reservation
-   - do not lose the booking reference
-   - log the email error safely
-   - return a useful message to the customer
-
-9. Preserve the existing SQLite database functionality.
-
-10. Preserve the existing booking reference functionality.
-
-11. Preserve the responsive desktop, tablet and mobile design.
-
-12. Do not add deployment functionality yet.
-
-13. Do not expose SMTP credentials or internal exception details
-    to the browser.
+1. Use pytest.
+2. Create automated tests for:
+   - home page loads successfully
+   - valid reservation succeeds
+   - missing customer name is rejected
+   - invalid email is rejected
+   - zero guests are rejected
+   - negative guests are rejected
+   - past reservation date is rejected
+   - invalid reservation time is rejected
+   - successful reservation is stored in SQLite
+   - booking reference is generated
+   - booking reference is unique
+   - confirmation response contains the booking reference
+3. Email sending must not send real emails during automated tests.
+4. Mock or disable SMTP during tests.
+5. Test email success behavior.
+6. Test email failure behavior.
+7. If email sending fails:
+   - reservation must remain stored
+   - booking reference must remain valid
+8. Tests must use a temporary test database, not the real reservations.sqlite3 file.
+9. Preserve all existing V5 functionality.
+10. Do not add deployment functionality yet.
 
 Before modifying any existing file, read it first.
 
-Use the available project tools to create or update the files.
+Use the project tools to create or update the files.
 """
 
     # ========================================
@@ -330,7 +306,14 @@ Preserve the existing SQLite reservation database.
 
 Preserve the existing booking reference functionality.
 
+Preserve the existing email confirmation functionality.
+
 Preserve the responsive desktop, tablet and mobile design.
+
+When creating tests, never send real emails and never modify
+the production reservation database.
+
+Tests must use isolated test data and a temporary test database.
 
 Do not add deployment configuration yet.
 
